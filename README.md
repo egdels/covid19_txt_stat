@@ -1,5 +1,5 @@
 # covid19_txt_stat
-The aim of this project is to create an evaluation of all Covid19 data published by german  Robert Koch Institute (RKI) as text files.
+The aim of this project is to create an evaluation of all Covid19 data published by german Robert Koch Institute (RKI) as text files.
 
 RKI publishes the complete data status on the current publication date on a daily basis. RKI does not publicly provided earlier publications that are outdated.
 Therefore, some of the data was not obtained directly from RKI but also from other sources.
@@ -18,11 +18,11 @@ Further sources are:
 A text file with the following evaluation characteristics is created for each publication date:
 * For every federal state and all of Germany: 
   * 7-day sample size and 7-day incidence
-  * Total cases, new cases, total deaths, new deaths, rate died, total recovered, new recovered, recovered rate
+  * Total cases, new cases, total deaths, new deaths, death rate, total recovery, new recovered, recovery rate
   * For each age group total cases, total deaths, death rate, total recovery, recovery rate
   * Diagram "New cases with reporting date within 7 days per 100 thousand (7-day incidence)"
   * Diagram "New deaths with reporting date within 30 days per 1 million in relation to the publication date"
-  * Diagram "Percentage of deaths in cases related to the date of publication"
+  * Diagram "Death rate related to the date of publication"
   * Diagram "Deaths by reporting date per 1 million in the current publication"
 * For every group of age:
   * Diagram "Deaths by reporting date of the age group in the current publication"
@@ -31,13 +31,14 @@ A text file with the following evaluation characteristics is created for each pu
 Note on age groups: RKI only provided data with smaller age groups (alterspruppe2) on April 28, 2020 and April 29, 2020 
 via the above-mentioned source. With regard to the uniformity of the evaluations, this feature is therefore ignored.  
 
-For smaller age groups, however, the number of cases and the number of deaths up to calendar week 2021/13 can also be taken indirectly from RKI situation reports 
+For smaller age groups, however, the number of cases and the number of deaths up to the 13th calendar week of 2021 
+can also be taken indirectly from RKI situation reports 
 (see [situation report](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Situationsberichte/Apr_2021/2021-04-06-de.pdf?__blob=publicationFile) and 
 [age distribution](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Altersverteilung.xlsx?__blob=publicationFile)). 
 
 This yields to:
 
-| age group | deaths up to 2021/13 | cases up to 2021/13 | rate died up to 2021/13 |                                                                                                               
+| age group | deaths up to 2021/13 | cases up to 2021/13 | death rate up to 2021/13 |                                                                                                               
 |:----------|----------------------|---------------------|:------------------------|
 | 90\+    | 17462                 | 70889               | 0,246328768             |
 | 80 - 89  | 35610           | 194619               | 0,182972885         |  
