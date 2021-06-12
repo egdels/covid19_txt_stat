@@ -55,6 +55,21 @@ This yields to:
 
 For calculations see [here.](./ref/Altersverteilung2.xlsx)
 
+In comparison the probability of death per age group for year 2017: (Source: [Statista](https://de.statista.com/statistik/daten/studie/3057/umfrage/sterbeziffern-nach-alter-und-geschlecht/):
+
+| age group | death rate 2017 | factor compared to death rate covid19 |                                                                                                              
+|:----------|:------------------------|:-----|
+| 90\+      | 0,4849                  | 1,96 |
+| 80 - 89   | 0,3657                  | 2,0  |
+| 70 - 79   | 0,1092                  | 1,21 |
+| 60 - 69   | 0,0454         		  | 2,04 |  
+| 50 - 59   | 0,0177                  | 4,13 |
+| 40 - 49  | 0,006                    | 5,59 |
+| 30 - 39  | 0,0025                   | 7,37 |
+| 20 - 29  | 0,0013                   | 11,04 | 
+| 10 - 19  | 0,0006  | 25,59 | 
+| 0 - 9    | 0,007   | 85,29 |
+
 ## Project structure
 The following files are included:
 
