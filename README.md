@@ -16,6 +16,7 @@ Further sources are:
 
 ## Scope of the evaluations
 A text file with the following evaluation characteristics is created for each publication date:
+ 
 * For every federal state and all of Germany: 
   * 7-day sample size and 7-day incidence
   * Total cases, new cases, total deaths, new deaths, death rate, total recovery, new recovered, recovery rate
@@ -25,8 +26,11 @@ A text file with the following evaluation characteristics is created for each pu
   * Diagram "Death rate related to the date of publication"
   * Diagram "Deaths by reporting date per 1 million in the current publication"
 * For every group of age:
+  * Infection fatality rate and actual number of infections \*\*
   * Diagram "Deaths by reporting date of the age group in the current publication"
   * Diagram "Proportion of deaths in the age group of those who died in relation to the date of publication"
+  * Diagram "Death rate per reporting week"
+  * Diagram "Proportion of newly deceased with a reporting date of more than 30 days"
   
 Note on age groups: RKI only provided data with smaller age groups (alterspruppe2) on April 28, 2020 and April 29, 2020 
 via the above-mentioned source. With regard to the uniformity of the evaluations, this feature is therefore ignored.  
