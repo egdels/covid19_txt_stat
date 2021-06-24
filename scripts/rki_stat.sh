@@ -87,10 +87,10 @@ if [ "$datenstand" = "2020/04/29" ]; then
 fi
 
 query="call CreateSimpleRKIStatBundesland('$datenstand');"
-#mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
+mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
 
 query="call CreateSimpleRKIStatAltersgruppe('$datenstand');"
-#mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
+mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
 
 function main {
 
