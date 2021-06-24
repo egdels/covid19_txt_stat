@@ -38,37 +38,42 @@ can also be taken indirectly from RKI situation reports
 
 This yields to:
 
-| age group | deaths up to 2021/13 | cases up to 2021/13 | death rate up to 2021/13 |                                                                                                               
-|:----------|----------------------|---------------------|:------------------------|
-| 90\+    | 17462                 | 70889               | 0,246328768             |
-| 80 - 89  | 35610           | 194619               | 0,182972885         |  
-| 70 - 79  | 14997                 | 166666            | 0,08998236         |  
-| 60 - 69  | 6075                 | 273264          | 0,022231249         |    
-| 50 - 59  | 2085           | 486412               | 0,00428649         |   
-| 40 - 49  | 441                 | 411075        | 0,001072797         |  
-| 30 - 39  | 149           | 439015        | 0,000339396         |  
-| 20 - 29  | 53           | 450001         | 0,000117778         |   
-| 10 - 19  | 6\*                  | 255943         | 0,0000234427\*         |   
-| 0 - 9    | 12\*           | 146219         | 0,0000820687\*       |  
+| age group | deaths | cases  | death rate (%) | ifr (%) \*\* | infections \*\* |                                                                                                              
+|:----------|--------|--------|:---------------|:-------------|-----------------|
+| 80\+  	| 53072  | 265508 | 19,9888516     | 6,284515995  | 844488 			|
+| 70 - 79  	| 14997  | 166666 | 8,998236       | 1,417722763  | 1057823 		|
+| 60 - 69  	| 6075   | 273264 | 2,2231249      | 0,398469707  | 1524583 		|
+| 50 - 59  	| 2085   | 486412 | 0,428649       | 0,110163609  | 1892640 		|
+| 40 - 49  	| 441    | 411075 | 0,1072797      | 0,023300792  | 1432616 		|
+| 30 - 39  	| 149    | 439015 | 0,0339396      | 0,009634081  | 1546593			|
+| 20 - 29  	| 53     | 450001 | 0,0117778      | 0,003928642  | 1349067 		|
+| 10 - 19  	| 6\*    | 255943 | 0,00234427\*   | 0,000556297  | 1078560			|
+| 0 - 9    	| 12\*   | 146219 | 0,00820687\*   | 0,001088078  | 1102862 		|
+| total     | 76890  | 2894103| 2,6567817	   | 0,649999932  | 11829232 		|
 
 \*: Could be lower according to RKI.
 
 For calculations see [here.](./ref/Altersverteilung2.xlsx)
 
+\*\*: Note on infection fatality rate: It is assumed across all age groups that 65% of those infected develop symptoms and 1% of those who are symptomatically infected die of pneumonia. 
+Accordingly, the total infection fatality rate (IFR) is 0.65%. It is also assumed that this IFR is constant over time and that every person has the same risk of getting infected. 
+The IFR for each age group is then estimated independently of the published case numbers based on the age distribution in Germany and the proportion of deaths in the age group. 
+The actual infections can then be calculated for each age group from the number of deaths and the IFR of the age group or, equivalent, from the total infection fatality rate, the total number of deaths and the age distribution.
+
 In comparison the probability of death per age group for year 2017 (Source: [Statista](https://de.statista.com/statistik/daten/studie/3057/umfrage/sterbeziffern-nach-alter-und-geschlecht/)):
 
-| age group | death rate 2017 | factor compared to death rate covid19 |                                                                                                              
-|:----------|:------------------------|:-----|
-| 90\+      | 0,4849                  | 1,96 |
-| 80 - 89   | 0,3657                  | 2,0  |
-| 70 - 79   | 0,1092                  | 1,21 |
-| 60 - 69   | 0,0454         		  | 2,04 |  
-| 50 - 59   | 0,0177                  | 4,13 |
-| 40 - 49  | 0,006                    | 5,59 |
-| 30 - 39  | 0,0025                   | 7,37 |
-| 20 - 29  | 0,0013                   | 11,04 | 
-| 10 - 19  | 0,0006  | 25,59 | 
-| 0 - 9    | 0,007   | 85,29 |
+| age group | death rate (%) |                                                                                                              
+|:----------|:---------------|
+| 90\+      | 48,49          |
+| 80 - 89   | 36,57          |
+| 70 - 79   | 10,92          |
+| 60 - 69   | 4,54           |  
+| 50 - 59   | 1,77           |
+| 40 - 49   | 0,6            |
+| 30 - 39   | 0,25           |
+| 20 - 29   | 0,13           | 
+| 10 - 19   | 0,06  	     | 
+| 0 - 9     | 0,7   	     |
 
 ## Project structure
 The following files are included:
