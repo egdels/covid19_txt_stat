@@ -102,7 +102,7 @@ The following files are included:
 * MySQL, version >= 15.1 Distrib 10.3.27-MariaDB
 * Gnuplot, verion >= 5.2 patchlevel 6
 * File, version >= 5.35
-* Minumim 100 GB storage
+* Minumim 200 GB storage
 
 ## Getting started
 * Setup database according to files in db folder and adjust parameter in db.config.
