@@ -1,10 +1,30 @@
 #!/bin/bash
 
-[ -z "$1" ] && datenstand=$(date +%Y/%m/%d) || datenstand=$1
+# Usage:
+# -d '2020/04/29' -o html
+# -d '2020/04/28' -o txt	
+
+# Defaults
+output="txt"
+datenstand=$(date +%Y/%m/%d)
+
+while getopts o:d: flag
+do
+    case "${flag}" in
+        o) output=${OPTARG};;
+        d) datenstand=${OPTARG};;
+    esac
+done
+
+[ $output != "html" ] && [ $output != "txt" ] && echo "-o darf nur die Werte txt oder html haben" && exit 1
+
+date "+%Y/%m/%d" -d $datenstand > /dev/null  2>&1
+is_valid=$?
+[ "$is_valid" != "0" ] && echo "-d muss im Format %Y/%m/%d sein" && exit 1
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 STAT_DIR=$THIS_DIR/../stat/
-FILE=rki_stat_$(echo $datenstand | sed 's#/#_#g').html
+FILE=rki_stat_$(echo $datenstand | sed 's#/#_#g').$output
 
 echo $FILE
 
@@ -94,18 +114,9 @@ mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
 
 function main {
 
-echo "<html>
-<head>
-<title>Datum der Auswertung: $datenstand</title>
-<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-</head><body><div id='content' style='max-width: 1200px; margin: auto'>" > $FILE
-text_to_file "<h1>Datum der Auswertung: $datenstand</h1>"
-
-#echo -e '\n' >> $FILE 
-
 for n in {0..16}
 do
-text_to_file "<h2>Kennzahlen ${bundesland[$n]} (Einwohner ${einwohner[$n]})</h2>"                 
+printHeader "Kennzahlen ${bundesland[$n]} (Einwohner ${einwohner[$n]})"                 
 
 # Einfache Statistik
 query="select fallzahl as '7-Tage-Fallzahl', incidence as '7-Tage-Inzidenz' from covid19_simple_stat_bundesland where datenstand ='$datenstand' and idbundesland = $n"
@@ -131,9 +142,12 @@ query="select m1.$altersgruppe_in_db as Altersgruppe, m1.summe as 'Faelle gesamt
 	on m1.$altersgruppe_in_db = m2.$altersgruppe_in_db and m2.$altersgruppe_in_db = m3.$altersgruppe_in_db and m1.$altersgruppe_in_db = m5.gruppe where m1.$altersgruppe_in_db !='unbekannt'"
 query_to_file "$query"
 
-text_to_file "<p>*: Es wird angenommen, dass über alle Altersgruppen 65 % der Infizierten Symptome entwickeln und 1 % von den symptomatisch Infizierten über alle Altersgruppen versterben. Demnach also die Infektionssterblichkeit (IFR) insgesamt bei 0,65 % liegt. Es wird ferner angegenommen, dass diese 
-IFR über die Zeit konstant ist und jede Person das gleiche Risiko hat sich zu infizieren. Die IFR für die Altersgruppen werden dann auf Basis der Altersverteilung in Deutschland und dem Anteil der Verstorbenen in der Altersgruppe unabhängig von den gemeldeten Fallzahlen zum Publikationsdatum geschätzt. 
-Die tatsächlichen Infektionen lassen sich dann für jede Altersgruppe aus der Anzahl der Verstorbenen und dem IFR der Altersgruppe oder gleichbedeutend über den gesamten IFR, die Gesamtanzahl der Verstorbenen und die Altersverteilung berechnen.</p>" 
+text_to_file "*: Es wird angenommen, dass über alle Altersgruppen 65 % der Infizierten Symptome entwickeln und 1 % von den symptomatisch Infizierten 
+über alle Altersgruppen versterben. Demnach also die Infektionssterblichkeit (IFR) insgesamt bei 0,65 % liegt. Es wird ferner angegenommen, dass diese 
+IFR über die Zeit konstant ist und jede Person das gleiche Risiko hat sich zu infizieren. Die IFR für die Altersgruppen werden dann auf Basis der Altersverteilung 
+in Deutschland und dem Anteil der Verstorbenen in der Altersgruppe unabhängig von den gemeldeten Fallzahlen zum Publikationsdatum geschätzt. Die tatsächlichen 
+Infektionen lassen sich dann für jede Altersgruppe aus der Anzahl der Verstorbenen und dem IFR der Altersgruppe oder gleichbedeutend über den gesamten IFR, die 
+Gesamtanzahl der Verstorbenen und die Altersverteilung berechnen." 
 else
 query="select m1.$altersgruppe_in_db as Altersgruppe, m1.summe as 'Faelle gesamt', m2.summe as 'Gestorbene gesamt', m2.summe / m1.summe as 'Rate gestorben' , m3.summe as 'Genesene gesamt', m3.summe / m1.summe as 'Rate genesen' from (
 		select $altersgruppe_in_db, sum(anzahlfall) as summe from covid19 where datenstand = '$datenstand'  and (IF($n=0,true, false) or IDBundesland = $n) and (NeuerFall = 1 or NeuerFall = 0) group by $altersgruppe_in_db
@@ -180,7 +194,7 @@ done
 #for m in "${altersgruppe[@]}"
 for m in "${!altersgruppe[@]}"
 do
-	text_to_file "<h2>Kennzahl ${altersgruppe[$m]} </h2>"
+printHeader "Kennzahl ${altersgruppe[$m]}"
 # Gestorbene nach Meldedatum in der aktuellen Publikation je 1 Mio. Einwohner
 query="select meldedatum, sum(AnzahlTodesfall) from covid19 where $altersgruppe_in_db = '${altersgruppe[$m]}' and datenstand = '$datenstand' and (NeuerTodesfall = 1 or NeuerTodesFall = 0) group by meldedatum"
 title="Gestorbene nach Meldedatum der Altersgruppe (${altersgruppe[$m]}) in der aktuellen Publikation"
@@ -219,10 +233,22 @@ plot_query_to_file "$query" "$title" "$xLabel" "$yLabel"
 
 
 done
-echo "</div></body></html>" >> $FILE
+
 }
 
 function query_to_file {
+	if [ "$output" == "html" ]; then
+		query_to_file_html "$1" 
+	else
+		query_to_file_txt "$1"
+	fi
+}
+
+function query_to_file_txt {
+	mysql -u "$USER" -p"$PASS" -h "$HOST" rki --table -e "$1" >> $FILE
+}
+
+function query_to_file_html {
 	echo "<div>" >> $FILE
 	mysql -u "$USER" -p"$PASS" -h "$HOST" rki -H -e "$1" >> $FILE
 	echo "</div>" >> $FILE
@@ -232,7 +258,40 @@ function text_to_file {
 	echo "$1" >> $FILE
 }
 
-function plot_query_to_file {
+function plot_query_to_file_txt {
+	outputFile="$STAT_DIR"plot_output.txt
+	inputFile="$STAT_DIR"plot_input.csv
+	
+	#set terminal dumb size 200, 60;
+	
+	query=$1
+	title=$2
+	xLabel=$3
+	yLabel=$4
+
+	mysql -u "$USER" -p"$PASS" -h "$HOST" rki --raw -N -L -e "$query" > $inputFile
+
+	gnuplot <<- EOF
+	reset
+	set title '$title'
+	set xlabel '$xLabel'
+	set ylabel '$yLabel'
+	set xdata time
+	set timefmt '%Y/%m/%d'
+	set format x '%Y/%m/%d'
+	set output '$outputFile' 
+	set terminal dumb size 200, 60;
+	set autoscale;
+	plot '$inputFile' using 1:2 with lines title '';
+	EOF
+	
+	cat $outputFile >> $FILE
+	
+	rm $outputFile
+	rm $inputFile
+}
+
+function plot_query_to_file_html {
 
 	outputFile="$STAT_DIR"plot_output.svg
 	inputFile="$STAT_DIR"plot_input.csv
@@ -268,8 +327,39 @@ function plot_query_to_file {
 	rm $inputFile
 }
 
-function plot_query_to_file2 {
+function plot_query_to_file2_txt {
+	outputFile="$STAT_DIR"plot_output.txt
+	inputFile="$STAT_DIR"plot_input.csv
+	
+	query=$1
+	title=$2
+	xLabel=$3
+	yLabel=$4
 
+	mysql -u "$USER" -p"$PASS" -h "$HOST" rki --raw -N -L -e "$query" > $inputFile
+
+	gnuplot <<- EOF
+	reset
+	set title '$title'
+
+	set xlabel '$xLabel'
+	set ylabel '$yLabel'
+	set xdata time
+	set timefmt '%Y-%m-%d'
+	set format x '%Y-%m-%d'
+	set output '$outputFile' 
+	set terminal dumb size 200, 60;
+	set autoscale;
+	plot '$inputFile' using 1:2 title '';
+	EOF
+	
+	cat $outputFile >> $FILE
+	
+	rm $outputFile
+	rm $inputFile
+}
+
+function plot_query_to_file2_html {
 	outputFile="$STAT_DIR"plot_output.svg
 	inputFile="$STAT_DIR"plot_input.csv
 	
@@ -303,4 +393,46 @@ function plot_query_to_file2 {
 	rm $inputFile
 }
 
+function plot_query_to_file {
+	if [ "$output" == "html" ]; then
+		plot_query_to_file_html "$1" "$2" "$3" "$4"
+	else
+		plot_query_to_file_txt "$1" "$2" "$3" "$4"
+	fi
+}
+
+function plot_query_to_file2 {
+	if [ "$output" == "html" ]; then
+		plot_query_to_file2_html "$1" "$2" "$3" "$4"
+	else
+		plot_query_to_file2_txt "$1" "$2" "$3" "$4"
+	fi
+}
+
+function printOpening {
+	if [ "$output" == "html" ]; then
+		echo "<html><head><title>Datum der Auswertung: $datenstand</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'></head><body><div id='content' style='max-width: 1200px; margin: auto'>" > $FILE
+		text_to_file "<h1>Datum der Auswertung: $datenstand</h1>"
+	else
+		echo "Datum der Auswertung: $datenstand" > $FILE
+		echo -e '\n' >> $FILE 
+	fi
+}
+
+function printClosing {
+	if [ "$output" == "html" ]; then
+		echo "</div></body></html>" >> $FILE
+	fi
+}
+
+function printHeader {
+	if [ "$output" == "html" ]; then
+		text_to_file "<h2>$1</h2>"
+	else
+		text_to_file "###################################################################### $1 ######################################################################"
+	fi  
+}
+
+printOpening
 main
+printClosing
