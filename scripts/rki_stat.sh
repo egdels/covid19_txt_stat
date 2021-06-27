@@ -37,6 +37,8 @@ while IFS=$'\t' read idbundesland namebundesland enw ;do
 	einwohner[$idbundesland]=$enw
 done  < <(mysql -u "$USER" -p"$PASS" -h "$HOST" rki -N -e "SELECT idbundesland, namebundesland, einwohner as enw from bundesland;")
 
+
+total_ifr=0.65 # in %
   
 altersgruppe1[1]="A00-A04"
 altersgruppe1[2]="A05-A14"
@@ -106,6 +108,10 @@ if [ "$datenstand" = "2020/04/29" ]; then
   declare -n altersverteilung=altersverteilung2
 fi
 
+# altersgruppen als komma-separierter 
+altersgruppen_string=$(IFS=, ; echo "${altersgruppe[*]}")
+altersgruppen_string="'"${altersgruppen_string//,/\',\'}"'"
+
 query="call CreateSimpleRKIStatBundesland('$datenstand');"
 mysql -u "$USER" -p"$PASS" -h "$HOST" rki -e "$query"
 
@@ -128,7 +134,7 @@ query_to_file "$query"
 # Altergruppen
 if [ "$n" -eq "0" ];
 then
-query="select m1.$altersgruppe_in_db as Altersgruppe, m1.summe as 'Faelle gesamt', m2.summe as 'Gestorbene gesamt', m2.summe / m1.summe as 'Rate gestorben' , m3.summe as 'Genesene gesamt', m3.summe / m1.summe as 'Rate genesen', (m2.summe / m4.tote_gesamt) * (0.65 / m5.anteil) as 'IFR* (%)', round (100 * m4.tote_gesamt * m5.anteil / 0.65, 0) as 'Infektionen*' from (
+query="select m1.$altersgruppe_in_db as Altersgruppe, m1.summe as 'Faelle gesamt', m2.summe as 'Gestorbene gesamt', m2.summe / m1.summe as 'Rate gestorben' , m3.summe as 'Genesene gesamt', m3.summe / m1.summe as 'Rate genesen', (m2.summe / m4.tote_gesamt) * ($total_ifr / m5.anteil) as 'IFR* (%)', round (100 * m4.tote_gesamt * m5.anteil / $total_ifr, 0) as 'Infektionen*' from (
 		select $altersgruppe_in_db, sum(anzahlfall) as summe from covid19 where datenstand = '$datenstand'  and (IF($n=0,true, false) or IDBundesland = $n) and (NeuerFall = 1 or NeuerFall = 0) group by $altersgruppe_in_db
 	) as m1 join (
 		select $altersgruppe_in_db, sum(anzahltodesfall) as summe from covid19 where datenstand = '$datenstand'  and (IF($n=0,true, false) or IDBundesland = $n) and (NeuerTodesFall = 1 or NeuerTodesFall = 0) group by $altersgruppe_in_db
@@ -204,7 +210,7 @@ plot_query_to_file "$query" "$title" "$xLabel" "$yLabel"
 
 # Anteil Gestorbener an den Faellen bezogen auf das Publikationsdatum
 query="select m1.datenstand, m2.tote / m1.tote_gesamt from (
-	select datenstand, sum(tote_gesamt) as tote_gesamt from covid19_simple_stat_altersgruppe where datenstand <= '$datenstand' group by datenstand
+	select datenstand, sum(tote_gesamt) as tote_gesamt from covid19_simple_stat_altersgruppe where altersgruppe in ($altersgruppen_string) and datenstand <= '$datenstand' group by datenstand
 ) as m1 inner join (
 	select datenstand, tote_gesamt as tote from covid19_simple_stat_altersgruppe where altersgruppe = '${altersgruppe[$m]}' and datenstand <= '$datenstand' group by datenstand
 ) as m2 on m1.datenstand = m2.datenstand"
@@ -313,6 +319,14 @@ function plot_query_to_file_html {
 	set xdata time
 	set timefmt '%Y/%m/%d'
 	set format x '%Y/%m/%d'
+	set arrow 1 from "2020/03/22", graph 0 to "2020/03/22",graph 1 nohead lt 0
+	set label "1. Lockdown" at "2020/03/22", graph 0.5 right rotate by 90
+	set arrow 2 from "2020/11/02", graph 0 to "2020/11/02",graph 1 nohead
+	set label "Lockdown light" at "2020/11/02", graph 0.5 right rotate by 90
+	set arrow 3 from "2020/12/16", graph 0 to "2020/12/16",graph 1 nohead
+	set label "2. Lockdown" at "2020/12/16", graph 0.5 right rotate by 90
+	set arrow 4 from "2021/04/24", graph 0 to "2021/04/24",graph 1 nohead
+	set label "Bundesnotbremse" at "2021/04/24", graph 0.5 right rotate by 90
 	set output '$outputFile' 
 	set term svg size 900,400
 	set autoscale;
@@ -379,6 +393,14 @@ function plot_query_to_file2_html {
 	set xdata time
 	set timefmt '%Y-%m-%d'
 	set format x '%Y-%m-%d'
+	set arrow 1 from "2020-03-22", graph 0 to "2020-03-22",graph 1 nohead lt 0
+	set label "1. Lockdown" at "2020-03-22", graph 0.5 right rotate by 90
+	set arrow 2 from "2020-11-02", graph 0 to "2020-11-02",graph 1 nohead
+	set label "Lockdown light" at "2020-11-02", graph 0.5 right rotate by 90
+	set arrow 3 from "2020-12-16", graph 0 to "2020-12-16",graph 1 nohead
+	set label "2. Lockdown" at "2020-12-16", graph 0.5 right rotate by 90
+	set arrow 4 from "2021-04-24", graph 0 to "2021-04-24",graph 1 nohead
+	set label "Bundesnotbremse" at "2021-04-24", graph 0.5 right rotate by 90
 	set output '$outputFile' 
 	set term svg size 900,400;
 	set autoscale;
