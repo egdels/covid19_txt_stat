@@ -327,6 +327,8 @@ function plot_query_to_file_html {
 	set label "2. Lockdown" at "2020/12/16", graph 0.5 right rotate by 90
 	set arrow 4 from "2021/04/24", graph 0 to "2021/04/24",graph 1 nohead
 	set label "Bundesnotbremse" at "2021/04/24", graph 0.5 right rotate by 90
+	set arrow 5 from "2020/11/18", graph 0 to "2020/11/18",graph 1 nohead
+	set label "Krankenhausfinanzierungsgesetz" at "2020/11/18", graph 0.7 right rotate by 90
 	set output '$outputFile' 
 	set term svg size 900,400
 	set autoscale;
@@ -401,6 +403,8 @@ function plot_query_to_file2_html {
 	set label "2. Lockdown" at "2020-12-16", graph 0.5 right rotate by 90
 	set arrow 4 from "2021-04-24", graph 0 to "2021-04-24",graph 1 nohead
 	set label "Bundesnotbremse" at "2021-04-24", graph 0.5 right rotate by 90
+	set arrow 5 from "2020-11-18", graph 0 to "2020-11-18",graph 1 nohead
+	set label "Krankenhausfinanzierungsgesetz" at "2020-11-18", graph 0.7 right rotate by 90
 	set output '$outputFile' 
 	set term svg size 900,400;
 	set autoscale;
